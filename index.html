@@ -2,85 +2,195 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VPN Store</title>
-  <!-- Telegram Web App SDK -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Fast Mail Shop</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      margin: 0;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--tg-theme-bg-color, #f4f5f7);
-      color: var(--tg-theme-text-color, #222);
+    :root {
+      --primary: #4F46E5;
+      --primary-light: #EEF2FF;
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --btn-blue: #3B82F6;
+      --btn-grad: linear-gradient(135deg, #4338CA, #6366F1);
     }
-    .container {
-      max-width: 420px;
-      margin: 0 auto;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text-main); padding-bottom: 80px; }
+
+    /* স্প্ল্যাশ স্ক্রিন */
+    #splash {
+      position: fixed; inset: 0; background: #ffffff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; transition: opacity 0.4s ease;
     }
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .subtitle {
-      color: var(--tg-theme-hint-color, #777);
-      font-size: 14px;
-    }
-    .plans-container {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .plan-card {
-      background: var(--tg-theme-secondary-bg-color, #ffffff);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      border: 1px solid rgba(0,0,0,0.06);
-    }
-    .plan-card.featured {
-      border: 2px solid var(--tg-theme-button-color, #2481cc);
-    }
-    .price {
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--tg-theme-button-color, #2481cc);
-      margin: 12px 0;
-    }
-    .buy-btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background-color: var(--tg-theme-button-color, #2481cc);
-      color: var(--tg-theme-button-text-color, #ffffff);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .splash-img { width: 95px; height: 95px; border-radius: 26px; background: #0E1726; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+    .progress-bar { width: 170px; height: 4px; background: #E2E8F0; border-radius: 4px; margin-top: 24px; overflow: hidden; }
+    .progress-fill { width: 50%; height: 100%; background: var(--primary); animation: load 1.2s infinite ease-in-out; }
+    @keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+
+    /* টপ বার */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border-bottom: 1px solid var(--border); }
+    .status-badge { background: #ECFDF5; color: #059669; font-size: 11px; padding: 4px 8px; border-radius: 20px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .brand-title { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+
+    /* ব্যালেন্স কার্ড */
+    .user-card { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin: 12px 16px; background: #fff; border-radius: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+    .user-info { display: flex; align-items: center; gap: 10px; }
+    .user-avatar { width: 38px; height: 38px; border-radius: 50%; background: #6366F1; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .balance-box { background: #4F46E5; color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 14px; }
+
+    /* ব্যানার ও ক্যাটাগরি */
+    .banner { margin: 0 16px 14px; background: linear-gradient(135deg, #1E1B4B, #312E81); border-radius: 14px; padding: 16px; color: #fff; text-align: left; }
+    .banner h4 { color: #FCD34D; margin-bottom: 4px; }
+    .cat-chips { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 12px; scrollbar-width: none; }
+    .chip { padding: 6px 14px; background: #fff; border: 1px solid var(--border); border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* প্রোডাক্ট গ্রিড */
+    .tab-content { display: none; padding: 0 16px; }
+    .tab-content.active { display: block; }
+    .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .product-card { background: #fff; border-radius: 14px; padding: 12px; border: 1px solid var(--border); text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+    .prod-icon { width: 55px; height: 55px; margin: 0 auto 8px; border-radius: 12px; background: #F8FAFC; display: flex; align-items: center; justify-content: center; padding: 6px; }
+    .prod-icon img { width: 100%; height: 100%; object-fit: contain; }
+    .prod-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .prod-plan { font-size: 11px; color: #10B981; margin-bottom: 8px; font-weight: 600; }
+    .buy-btn { background: var(--btn-blue); color: #fff; border: none; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+    /* বটম শীট (Modal) */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: flex-end; }
+    .modal-sheet { background: #fff; width: 100%; border-radius: 24px 24px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .close-btn { position: absolute; right: 20px; top: 20px; background: #F1F5F9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; }
+
+    /* বটম নেভিগেশন */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #fff; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+    .nav-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-muted); font-size: 11px; cursor: pointer; }
+    .nav-btn.active { color: var(--primary); font-weight: 700; }
+    .center-fab { background: var(--btn-grad); color: #fff !important; width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-top: -15px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h2 id="user-greeting">স্বাগতম!</h2>
-      <p class="subtitle">আপনার পছন্দের VPN সাবস্ক্রিপশন বেছে নিন</p>
-    </header>
 
-    <div class="plans-container">
-      <div class="plan-card">
-        <h3>১ মাস মেয়াদী VPN</h3>
-        <p class="price">৳১০০</p>
-        <button class="buy-btn" onclick="selectPlan('১ মাস', 100)">সাবস্ক্রাইব করুন</button>
-      </div>
+  <!-- স্প্ল্যাশ -->
+  <div id="splash">
+    <div class="splash-img"><i class="fa-solid fa-bolt" style="font-size:36px; color:#F59E0B;"></i></div>
+    <h3 style="margin-top:16px;">Fast Mail Shop</h3>
+    <p style="font-size:12px; color:#64748B; margin-top:4px;">Initializing secure session...</p>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+  </div>
 
-      <div class="plan-card featured">
-        <h3>৩ মাস মেয়াদী VPN</h3>
-        <p class="price">৳২৫০</p>
-        <button class="buy-btn" onclick="selectPlan('৩ মাস', 250)">সাবস্ক্রাইব করুন</button>
+  <!-- হেডার -->
+  <div class="top-bar">
+    <div class="status-badge"><i class="fa-solid fa-check"></i> TG Connected</div>
+    <div class="brand-title"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Fast Mail</div>
+    <i class="fa-regular fa-bell" style="font-size: 18px; color:#64748B;"></i>
+  </div>
+
+  <!-- ব্যালেন্স বার -->
+  <div class="user-card">
+    <div class="user-info">
+      <div class="user-avatar" id="avatar-let">U</div>
+      <div>
+        <div style="font-size:11px; color:var(--text-muted);">Welcome back,</div>
+        <div style="font-size:14px; font-weight:700;" id="user-name">User</div>
       </div>
     </div>
+    <div class="balance-box" id="user-bal">৳ 0.00</div>
+  </div>
+
+  <!-- হোম ট্যাব -->
+  <div id="tab-home" class="tab-content active">
+    <div class="banner">
+      <h4>⚡ Instant Proxy & VPN</h4>
+      <p style="font-size:12px;">টেলিগ্রাম ইনস্ট্যান্ট ডেলিভারি ও রিয়েল-টাইম প্রক্সি সার্ভিস।</p>
+    </div>
+    <div class="cat-chips">
+      <div class="chip active">All Products</div>
+      <div class="chip">Proxy Items</div>
+      <div class="chip">VPN Services</div>
+    </div>
+    <div class="products-grid" id="home-grid"></div>
+  </div>
+
+  <!-- ডিপোজিট ট্যাব -->
+  <div id="tab-deposit" class="tab-content">
+    <div style="background:#fff; padding:16px; border-radius:14px; border:1px solid var(--border);">
+      <h3>Add Balance</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin:4px 0 14px;">বিকাশ / নগদ নাম্বারে সেন্ড মানি করে TrxID সাবমিট করুন:</p>
+      <div style="background:#EEF2FF; padding:12px; border-radius:10px; font-size:13px; line-height:1.6; margin-bottom:14px;">
+        📱 <b>bKash / Nagad (Personal):</b> <code>017XXXXXXXX</code><br>
+        <i>(টাকা পাঠিয়ে TrxID নিচে লিখুন)</i>
+      </div>
+      <input type="number" id="dep-amount" placeholder="টাকার পরিমাণ (৳)" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid var(--border); border-radius:8px;">
+      <input type="text" id="dep-trx" placeholder="Transaction ID (TrxID)" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid var(--border); border-radius:8px;">
+      <button class="buy-btn" style="width:100%; padding:12px;" onclick="submitDeposit()">Submit Deposit</button>
+    </div>
+  </div>
+
+  <!-- প্রোফাইল ও অ্যাডমিন ট্যাব -->
+  <div id="tab-profile" class="tab-content">
+    <div style="background:#fff; padding:16px; border-radius:14px; border:1px solid var(--border); margin-bottom:12px;">
+      <h4 id="prof-user">My Account</h4>
+      <p style="font-size:12px; color:var(--text-muted);" id="prof-uid">ID: 000000</p>
+    </div>
+
+    <!-- গোপন অ্যাডমিন প্যানেল (শুধুমাত্র UID 8919985167 এর জন্য) -->
+    <div id="admin-panel" style="display:none; background:#fff; padding:16px; border-radius:14px; border:2px dashed var(--primary);">
+      <h4 style="color:var(--primary); margin-bottom:8px;">⚙️ Admin Controls</h4>
+      <p style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">প্রোডাক্ট যোগ করুন বা ইউজারের ব্যালেন্স রিচার্জ করুন:</p>
+      
+      <input type="text" id="adm-pname" placeholder="প্রোডাক্ট নাম" style="width:100%; padding:8px; margin-bottom:6px; border:1px solid var(--border); border-radius:6px;">
+      <input type="text" id="adm-pplan" placeholder="প্ল্যান (যেমন: 1 GB)" style="width:100%; padding:8px; margin-bottom:6px; border:1px solid var(--border); border-radius:6px;">
+      <input type="number" id="adm-pprice" placeholder="দাম (৳)" style="width:100%; padding:8px; margin-bottom:6px; border:1px solid var(--border); border-radius:6px;">
+      <input type="text" id="adm-picon" placeholder="আইকন/ইমেজ URL" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid var(--border); border-radius:6px;">
+      <button class="buy-btn" style="width:100%; margin-bottom:16px;" onclick="adminAddProduct()">Add Product</button>
+
+      <hr style="margin-bottom:14px; border:0; border-top:1px solid var(--border);">
+      <input type="text" id="adm-uid" placeholder="ইউজার টেলিগ্রাম ID" style="width:100%; padding:8px; margin-bottom:6px; border:1px solid var(--border); border-radius:6px;">
+      <input type="number" id="adm-bal" placeholder="ব্যালেন্স পরিমাণ (৳)" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid var(--border); border-radius:6px;">
+      <button class="buy-btn" style="width:100%; background:#10B981;" onclick="adminAddBalance()">Recharge User Balance</button>
+    </div>
+  </div>
+
+  <!-- বটম শীট (অর্ডার Modal) -->
+  <div class="modal-overlay" id="order-modal">
+    <div class="modal-sheet">
+      <button class="close-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div style="text-align:center; margin-bottom:14px;">
+        <div class="prod-icon" style="width:70px; height:70px;"><img id="m-icon" src="" alt=""></div>
+        <h3 id="m-name" style="margin-top:6px;">Proxy Name</h3>
+        <p style="font-size:12px; color:#10B981; font-weight:600;" id="m-plan">1 GB</p>
+      </div>
+
+      <div style="background:#F8FAFC; padding:12px; border-radius:12px; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+          <span>Price:</span><b id="m-price">৳0.00</b>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:13px;">
+          <span>Delivery Type:</span><span style="background:#E2E8F0; padding:2px 6px; border-radius:4px; font-size:11px;">Instant CD Key</span>
+        </div>
+      </div>
+
+      <div style="font-size:12px; line-height:1.8; margin-bottom:18px;">
+        <div>✅ Premium Proxy 195+ Countries</div>
+        <div>✅ Smart IP Rotation & HTTP/SOCKS5</div>
+        <div>✅ Instant Telegram Bot Delivery</div>
+      </div>
+
+      <button id="m-action-btn" class="buy-btn" style="width:100%; padding:14px; font-size:14px;" onclick="executePurchase()">Confirm Purchase</button>
+    </div>
+  </div>
+
+  <!-- নেভ বার -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('home')"><i class="fa-solid fa-house"></i>Home</button>
+    <button class="nav-btn center-fab" onclick="switchTab('deposit')"><i class="fa-solid fa-wallet"></i></button>
+    <button class="nav-btn" onclick="switchTab('profile')"><i class="fa-solid fa-user"></i>Profile</button>
   </div>
 
   <script>
@@ -88,17 +198,150 @@
     tg.ready();
     tg.expand();
 
+    let user = { id: "8919985167", first_name: "Umma" };
     if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-      document.getElementById('user-greeting').innerText = `হ্যালো, ${tg.initDataUnsafe.user.first_name}!`;
+      user = tg.initDataUnsafe.user;
     }
 
-    function selectPlan(plan, price) {
-      tg.MainButton.text = `${plan} কিনতে চান (৳${price})`;
-      tg.MainButton.show();
-      tg.MainButton.onClick(() => {
-        tg.showAlert(`আপনি ${plan} প্ল্যান সিলেক্ট করেছেন! পরবর্তী ধাপে পেমেন্ট গেটওয়ে আসবে।`);
+    let currentBalance = 0.0;
+    let selectedProduct = null;
+
+    document.getElementById('user-name').innerText = user.first_name;
+    document.getElementById('avatar-let').innerText = user.first_name[0];
+    document.getElementById('prof-user').innerText = user.first_name;
+    document.getElementById('prof-uid').innerText = `ID: ${user.id}`;
+
+    setTimeout(() => {
+      const splash = document.getElementById('splash');
+      splash.style.opacity = '0';
+      setTimeout(() => splash.style.display = 'none', 400);
+    }, 700);
+
+    function switchTab(t) {
+      document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
+      document.getElementById(`tab-${t}`).classList.add('active');
+    }
+
+    // ইউজার সিঙ্ক ও অ্যাডমিন ভেরিফিকেশন
+    fetch('/api/user/sync', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ user_id: user.id, first_name: user.first_name, username: user.username || '' })
+    }).then(r => r.json()).then(res => {
+      currentBalance = res.balance;
+      document.getElementById('user-bal').innerText = `৳ ${currentBalance.toFixed(2)}`;
+      if (res.is_admin) {
+        document.getElementById('admin-panel').style.display = 'block';
+      }
+    });
+
+    // প্রোডাক্ট লোড করা
+    function loadProducts() {
+      fetch('/api/products').then(r => r.json()).then(data => {
+        let h = '';
+        data.products.forEach(p => {
+          h += `
+            <div class="product-card" onclick='openModal(${JSON.stringify(p)})'>
+              <div class="prod-icon"><img src="${p.icon}" alt=""></div>
+              <div class="prod-name">${p.name}</div>
+              <div class="prod-plan">${p.plan}</div>
+              <button class="buy-btn"><i class="fa-solid fa-cart-shopping"></i> ৳${p.price}</button>
+            </div>
+          `;
+        });
+        document.getElementById('home-grid').innerHTML = h;
       });
     }
+
+    function openModal(p) {
+      selectedProduct = p;
+      document.getElementById('m-icon').src = p.icon;
+      document.getElementById('m-name').innerText = p.name;
+      document.getElementById('m-plan').innerText = p.plan;
+      document.getElementById('m-price').innerText = `৳${p.price.toFixed(2)}`;
+
+      const btn = document.getElementById('m-action-btn');
+      if (currentBalance < p.price) {
+        btn.innerText = `Add funds — need ৳${(p.price - currentBalance).toFixed(2)} more`;
+        btn.style.background = '#F97316';
+        btn.onclick = () => { closeModal(); switchTab('deposit'); };
+      } else {
+        btn.innerText = `Confirm Purchase (৳${p.price})`;
+        btn.style.background = '#3B82F6';
+        btn.onclick = executePurchase;
+      }
+      document.getElementById('order-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('order-modal').style.display = 'none';
+    }
+
+    function executePurchase() {
+      fetch('/api/buy', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: user.id, product_id: selectedProduct.id })
+      }).then(r => r.json()).then(res => {
+        closeModal();
+        if(res.success) {
+          tg.showAlert(`✅ অর্ডার সফল হয়েছে!\n\nআপনার কী: ${res.key}\n(আপনার টেলিগ্রাম ইনবক্সেও পাঠানো হয়েছে)`);
+          currentBalance = res.new_balance;
+          document.getElementById('user-bal').innerText = `৳ ${currentBalance.toFixed(2)}`;
+        } else {
+          tg.showAlert(res.message);
+        }
+      });
+    }
+
+    function submitDeposit() {
+      const amount = document.getElementById('dep-amount').value;
+      const trxid = document.getElementById('dep-trx').value;
+      if (!amount || !trxid) return tg.showAlert("সবগুলো ঘর পূরণ করুন!");
+
+      fetch('/api/deposit/request', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: user.id, amount, trxid })
+      }).then(r => r.json()).then(res => {
+        tg.showAlert(res.message);
+        document.getElementById('dep-amount').value = '';
+        document.getElementById('dep-trx').value = '';
+      });
+    }
+
+    function adminAddProduct() {
+      const name = document.getElementById('adm-pname').value;
+      const plan = document.getElementById('adm-pplan').value;
+      const price = document.getElementById('adm-pprice').value;
+      const icon = document.getElementById('adm-picon').value || 'https://api.iconify.design/flat-color-icons:globe.svg';
+
+      fetch('/api/admin/add-product', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ admin_id: user.id, name, category: 'Proxy', plan, price, stock: 50, icon })
+      }).then(r => r.json()).then(res => {
+        tg.showAlert(res.message);
+        loadProducts();
+      });
+    }
+
+    function adminAddBalance() {
+      const target_user_id = document.getElementById('adm-uid').value;
+      const amount = document.getElementById('adm-bal').value;
+
+      fetch('/api/admin/add-balance', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ admin_id: user.id, target_user_id, amount })
+      }).then(r => r.json()).then(res => {
+        tg.showAlert(res.message);
+      });
+    }
+
+    loadProducts();
   </script>
 </body>
-</html>
+  </html>
+  
